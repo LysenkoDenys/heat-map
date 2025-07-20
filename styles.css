@@ -33,9 +33,14 @@ main {
 }
 
 h1 {
-  font-size: clamp(1.2rem, 2vw, 2rem);
+  font-size: clamp(2rem, 6vw, 5rem);
   color: var(--color-primary);
-  text-align: center;
+  margin: 0 auto;
+}
+
+h3 {
+  font-size: clamp(0.8rem, 1.2vw, 1.2rem);
+  color: var(--color-primary);
 }
 
 .container {

@@ -10,11 +10,18 @@ const padding = 60;
 d3.select('body')
   .append('h1')
   .attr('id', 'title')
+  .append('h3')
+  .attr('id', 'description')
   .append('text')
-  .text('Monthly Global Land-Surface Temperature')
-  .append('div')
-  .attr('class', 'container')
-  .append('svg');
+  .text('Monthly Global Land-Surface Temperature');
+
+d3.select('body')
+  .append('h3')
+  .attr('id', 'description')
+  .append('text')
+  .text('1753 - 2015: base temperature 8.66℃');
+
+d3.select('body').append('div').attr('class', 'container').append('svg');
 
 // const tooltip = d3
 //   .select('#tooltip')
