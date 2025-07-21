@@ -32,15 +32,15 @@ main {
   padding: 1rem;
 }
 
-h1 {
-  font-size: clamp(2rem, 6vw, 5rem);
+h1,
+h3 {
+  font-size: clamp(1.5rem, 4vw, 3rem);
   color: var(--color-primary);
-  margin: 0 auto;
+  text-align: center;
 }
 
 h3 {
-  font-size: clamp(0.8rem, 1.2vw, 1.2rem);
-  color: var(--color-primary);
+  font-size: clamp(1rem, 2vw, 1.5rem);
 }
 
 .container {
