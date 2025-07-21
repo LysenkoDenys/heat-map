@@ -28,19 +28,16 @@ body {
   line-height: 1.4;
 }
 
-main {
-  padding: 1rem;
-}
-
 h1,
 h3 {
-  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-size: clamp(1rem, 2vw, 2rem);
   color: var(--color-primary);
   text-align: center;
 }
 
 h3 {
-  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(0.7rem, 2vw, 1.2rem);
+  margin: 5px 0;
 }
 
 .container {
@@ -71,30 +68,6 @@ svg {
   max-width: 100%;
 }
 
-svg text {
-  font-size: 0.9rem;
-  font-size: clamp(0.6rem, 1.5vw, 1rem);
-}
-
-svg .info {
-  font-size: clamp(0.5rem, 1.2vw, 0.9rem);
-}
-
-#legend {
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-}
-
-#legend text {
-  fill: #333;
-}
-
-#legend rect {
-  stroke: black;
-  stroke-width: 0.5;
-  rx: 2; /* rounded corners */
-}
-
 #tooltip {
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #999;
@@ -104,4 +77,16 @@ svg .info {
   font-size: 12px;
   pointer-events: none;
   transition: opacity 0.2s ease-in-out;
+}
+
+#y-axis text,
+#x-axis text {
+  font-size: clamp(0.5rem, 1vw, 0.7rem);
+  font-family: sans-serif; /* optional */
+}
+
+#x-text,
+#y-text {
+  font-size: clamp(0.6rem, 1vw, 0.8rem);
+  font-weight: 600;
 }

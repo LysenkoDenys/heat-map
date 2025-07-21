@@ -3,7 +3,7 @@ const dataUrl =
 
 const w = 800;
 const h = 500;
-const padding = 60;
+const padding = 70;
 const baseTemp = 8.66;
 
 d3.select('body')
@@ -60,21 +60,37 @@ const fetchTemperatureData = async () => {
       .domain(d3.range(1, 13)) // months 1–12
       .range([padding, h - padding]);
 
+    const colorScale = d3
+      .scaleQuantize()
+      .domain(d3.extent(data, (d) => baseTemp + d.variance))
+      .range([
+        '#313695',
+        '#4575b4',
+        '#74add1',
+        '#abd9e9',
+        '#fee090',
+        '#fdae61',
+        '#f46d43',
+        '#d73027',
+      ]);
+
     svg
       .selectAll('rect')
       .data(data)
       .enter()
       .append('rect')
+      .attr('class', 'cell')
       .attr('x', (d) => xScale(new Date(d['year'], 0)))
       .attr('y', (d) => yScale(d.month))
-      .attr('fill', 'green')
+      .attr('fill', (d) => colorScale(baseTemp + d.variance))
       .attr(
         'width',
         (w - 2 * padding) / (maxYear.getFullYear() - minYear.getFullYear())
       )
       .attr('height', yScale.bandwidth())
       .attr('data-year', (d) => d.year)
-      .attr('data-month', (d) => d.month - 1);
+      .attr('data-month', (d) => d.month - 1)
+      .attr('data-temp', (d) => (baseTemp + d.variance).toFixed(3));
     // ========================================================
     // .on('mouseover', function (event, d) {
     //   tooltip
@@ -107,7 +123,9 @@ const fetchTemperatureData = async () => {
     drawLegend(svg, w);
 
     const xAxis = d3.axisBottom(xScale);
-    const yAxis = d3.axisLeft(yScale).tickFormat(formatTime);
+    const yAxis = d3
+      .axisLeft(yScale)
+      .tickFormat((m) => d3.timeFormat('%B')(new Date(0, m - 1)));
 
     svg
       .append('g')
@@ -120,6 +138,22 @@ const fetchTemperatureData = async () => {
       .attr('id', 'y-axis')
       .attr('transform', `translate(${padding},0)`)
       .call(yAxis);
+
+    svg
+      .append('text')
+      .attr('x', w / 2)
+      .attr('y', h - 35)
+      .attr('id', 'x-text')
+      .attr('text-anchor', 'middle')
+      .text('Years [y]');
+    svg
+      .append('text')
+      .attr('x', -h / 2)
+      .attr('y', 20)
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'rotate(-90)')
+      .attr('id', 'y-text')
+      .text('Months');
   } catch (error) {
     console.error('Fetch error:', error);
   }
@@ -160,3 +194,21 @@ const drawLegend = (svg, w) => {
 };
 
 fetchTemperatureData();
+
+// "baseTemperature": 8.66,
+// "monthlyVariance": [
+//   {
+//     "year": 1753,
+//     "month": 1,
+//     "variance": -1.366
+//   },
+//   {
+//     "year": 1753,
+//     "month": 2,
+//     "variance": -2.223
+//   },
+//   {
+//     "year": 1753,
+//     "month": 3,
+//     "variance": 0.211
+//   },
