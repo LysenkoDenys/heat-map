@@ -116,7 +116,7 @@ const fetchTemperatureData = async () => {
         d3.select(this).attr('stroke', null);
       });
     //===========================================================
-    drawLegend(svg, w);
+    drawLegend(svg, w, colorScale);
 
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3
@@ -155,10 +155,9 @@ const fetchTemperatureData = async () => {
   }
 };
 
-const drawLegend = (svg, w, data) => {
+const drawLegend = (svg, w, colorScale) => {
   const legendWidth = 300;
   const legendHeight = 30;
-  const legendPadding = 10;
   const boxWidth = legendWidth / temperatureColorPalette.length;
   const legendX = (w - legendWidth) / 2;
   const legendY = 20;
@@ -178,6 +177,26 @@ const drawLegend = (svg, w, data) => {
     .attr('height', legendHeight)
     .attr('fill', (d) => d)
     .attr('stroke', '#ccc');
+
+  const tempExtent = colorScale.domain(); // [minTemp, maxTemp]
+
+  const xScaleLegend = d3
+    .scaleLinear()
+    .domain(tempExtent)
+    .range([0, legendWidth]);
+
+  const xAxisLegend = d3
+    .axisBottom(xScaleLegend)
+    .ticks(temperatureColorPalette.length)
+    .tickFormat(d3.format('.1f'));
+
+  legend
+    .append('g')
+    .attr('id', 'x-axis-legend')
+    .attr('transform', `translate(0, ${legendHeight})`)
+    .call(xAxisLegend);
 };
 
 fetchTemperatureData();
+
+// responsive design
