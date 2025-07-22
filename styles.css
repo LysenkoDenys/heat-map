@@ -39,12 +39,32 @@ h3 {
   font-size: clamp(0.7rem, 2vw, 1.2rem);
   margin: 5px 0;
 }
+@media (max-width: 400px) {
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 0.9rem;
+  }
+
+  #tooltip {
+    font-size: 10px;
+  }
+
+  #x-text,
+  #y-text {
+    font-size: 0.6rem;
+  }
+}
 
 .container {
   max-width: 800px;
   min-width: 300px;
   width: 100%;
-  margin: 0 auto;
+  max-width: 1000px;
+  padding: 1rem;
+  margin: 1rem;
   background-color: var(--color-primary);
   border-radius: 0.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);

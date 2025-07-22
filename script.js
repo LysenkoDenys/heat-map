@@ -32,8 +32,8 @@ const svg = d3
   .append('div')
   .attr('class', 'container')
   .append('svg')
-  .attr('width', w)
-  .attr('height', h);
+  .attr('viewBox', `0 0 ${w} ${h}`)
+  .attr('preserveAspectRatio', 'xMidYMid meet');
 
 const tooltip = d3
   .select('body')
@@ -105,7 +105,10 @@ const fetchTemperatureData = async () => {
               baseTemp + d.variance
             ).toFixed(1)}℃<br>${d.variance.toFixed(1)}℃`
           )
-          .style('left', event.pageX + 10 + 'px')
+          .style(
+            'left',
+            Math.min(event.pageX + 10, window.innerWidth - 150) + 'px'
+          )
           .style('top', event.pageY - 40 + 'px');
 
         d3.select(this).attr('stroke', 'black').transition().duration(200);
@@ -178,16 +181,20 @@ const drawLegend = (svg, w, colorScale) => {
     .attr('fill', (d) => d)
     .attr('stroke', '#ccc');
 
-  const tempExtent = colorScale.domain(); // [minTemp, maxTemp]
+  const tempExtent = colorScale.domain();
 
   const xScaleLegend = d3
     .scaleLinear()
     .domain(tempExtent)
     .range([0, legendWidth]);
 
+  const legendThresholds = colorScale.range().map((d) => {
+    return colorScale.invertExtent(d)[0];
+  });
+
   const xAxisLegend = d3
     .axisBottom(xScaleLegend)
-    .ticks(temperatureColorPalette.length)
+    .tickValues(legendThresholds)
     .tickFormat(d3.format('.1f'));
 
   legend
@@ -198,5 +205,3 @@ const drawLegend = (svg, w, colorScale) => {
 };
 
 fetchTemperatureData();
-
-// responsive design
