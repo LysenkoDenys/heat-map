@@ -6,6 +6,17 @@ const h = 500;
 const padding = 70;
 const baseTemp = 8.66;
 
+const temperatureColorPalette = [
+  '#313695',
+  '#4575b4',
+  '#74add1',
+  '#abd9e9',
+  '#fee090',
+  '#fdae61',
+  '#f46d43',
+  '#d73027',
+];
+
 d3.select('body')
   .append('h1')
   .attr('id', 'title')
@@ -24,12 +35,16 @@ const svg = d3
   .attr('width', w)
   .attr('height', h);
 
-//=========================================================
-// const tooltip = d3
-//   .select('#tooltip')
-//   .style('opacity', 0)
-//   .style('position', 'absolute');
+const tooltip = d3
+  .select('body')
+  .append('div')
+  .attr('id', 'tooltip')
+  .style('opacity', 0)
+  .style('position', 'absolute')
+  .style('pointer-events', 'none')
+  .style('z-index', 10);
 
+//=========================================================
 const fetchTemperatureData = async () => {
   try {
     const response = await fetch(dataUrl);
@@ -38,17 +53,14 @@ const fetchTemperatureData = async () => {
     const data = dataset.monthlyVariance;
     const years = data.map((d) => new Date(d['year'], 0));
 
-    // console.log(dataset.monthlyVariance[0]['year']); //
-    // console.log(years); //
-
     const minYear = d3.min(years);
     const maxYear = d3.max(years);
 
     const extendedMinYear = new Date(minYear);
-    extendedMinYear.setFullYear(extendedMinYear.getFullYear() - 1);
+    extendedMinYear.setFullYear(extendedMinYear.getFullYear());
 
     const extendedMaxYear = new Date(maxYear);
-    extendedMaxYear.setFullYear(extendedMaxYear.getFullYear() + 1);
+    extendedMaxYear.setFullYear(extendedMaxYear.getFullYear());
 
     const xScale = d3
       .scaleTime()
@@ -63,16 +75,7 @@ const fetchTemperatureData = async () => {
     const colorScale = d3
       .scaleQuantize()
       .domain(d3.extent(data, (d) => baseTemp + d.variance))
-      .range([
-        '#313695',
-        '#4575b4',
-        '#74add1',
-        '#abd9e9',
-        '#fee090',
-        '#fdae61',
-        '#f46d43',
-        '#d73027',
-      ]);
+      .range(temperatureColorPalette);
 
     svg
       .selectAll('rect')
@@ -90,35 +93,28 @@ const fetchTemperatureData = async () => {
       .attr('height', yScale.bandwidth())
       .attr('data-year', (d) => d.year)
       .attr('data-month', (d) => d.month - 1)
-      .attr('data-temp', (d) => (baseTemp + d.variance).toFixed(3));
-    // ========================================================
-    // .on('mouseover', function (event, d) {
-    //   tooltip
-    //     .style('opacity', 1)
-    //     .style('display', 'block')
-    //     .attr('data-year', new Date(d.Year, 0))
-    //     .html(
-    //       `${d.Name}: ${d.Nationality}<br>Year: ${d.Year}, Time: ${d.Time}`
-    //     )
-    //     .style('left', parseInt(xScale(new Date(d['Year'], 0))) + 10 + 'px')
-    //     .style(
-    //       'top',
-    //       parseInt(yScale(parseTime(d['Time']))) + padding / 2 + 'px'
-    //     );
+      .attr('data-temp', (d) => (baseTemp + d.variance).toFixed(3))
+      // ========================================================
+      .on('mouseover', function (event, d) {
+        tooltip
+          .style('opacity', 1)
+          .style('display', 'block')
+          .attr('data-year', d.year)
+          .html(
+            `${d.year} - ${d3.timeFormat('%B')(new Date(0, d.month - 1))}<br>${(
+              baseTemp + d.variance
+            ).toFixed(1)}℃<br>${d.variance.toFixed(1)}℃`
+          )
+          .style('left', event.pageX + 10 + 'px')
+          .style('top', event.pageY - 40 + 'px');
 
-    //   d3.select(this)
-    //     .attr('fill', 'red')
-    //     .transition()
-    //     .duration(200)
-    //     .attr('r', 7);
-    // })
+        d3.select(this).attr('stroke', 'black').transition().duration(200);
+      })
 
-    // .on('mouseout', function () {
-    //   tooltip.style('opacity', 0);
-    //   d3.select(this)
-    //     .attr('fill', (d) => (d.Doping ? 'orange' : 'green'))
-    //     .attr('r', 5);
-    // });
+      .on('mouseout', function () {
+        tooltip.style('opacity', 0).style('display', 'none');
+        d3.select(this).attr('stroke', null);
+      });
     //===========================================================
     drawLegend(svg, w);
 
@@ -159,56 +155,29 @@ const fetchTemperatureData = async () => {
   }
 };
 
-const drawLegend = (svg, w) => {
-  const legend = svg.append('g').attr('id', 'legend');
+const drawLegend = (svg, w, data) => {
+  const legendWidth = 300;
+  const legendHeight = 30;
+  const legendPadding = 10;
+  const boxWidth = legendWidth / temperatureColorPalette.length;
+  const legendX = (w - legendWidth) / 2;
+  const legendY = 20;
 
-  // legend
-  //   .append('rect')
-  //   .attr('x', w - 200)
-  //   .attr('y', 100)
-  //   .attr('width', 15)
-  //   .attr('height', 15)
-  //   .style('fill', 'orange');
-  // legend
-  //   .append('text')
-  //   .attr('x', w - 180)
-  //   .attr('y', 112)
-  //   .text('Riders with doping allegations')
-  //   .style('font-size', '12px')
-  //   .attr('alignment-baseline', 'middle');
+  const legend = svg
+    .append('g')
+    .attr('id', 'legend')
+    .attr('transform', `translate(${legendX}, ${legendY})`);
 
-  // legend
-  //   .append('rect')
-  //   .attr('x', w - 200)
-  //   .attr('y', 130)
-  //   .attr('width', 15)
-  //   .attr('height', 15)
-  //   .style('fill', 'green');
-  // legend
-  //   .append('text')
-  //   .attr('x', w - 180)
-  //   .attr('y', 142)
-  //   .text('No doping allegations')
-  //   .style('font-size', '12px')
-  //   .attr('alignment-baseline', 'middle');
+  legend
+    .selectAll('rect')
+    .data(temperatureColorPalette)
+    .enter()
+    .append('rect')
+    .attr('x', (d, i) => i * boxWidth)
+    .attr('width', boxWidth)
+    .attr('height', legendHeight)
+    .attr('fill', (d) => d)
+    .attr('stroke', '#ccc');
 };
 
 fetchTemperatureData();
-
-// "baseTemperature": 8.66,
-// "monthlyVariance": [
-//   {
-//     "year": 1753,
-//     "month": 1,
-//     "variance": -1.366
-//   },
-//   {
-//     "year": 1753,
-//     "month": 2,
-//     "variance": -2.223
-//   },
-//   {
-//     "year": 1753,
-//     "month": 3,
-//     "variance": 0.211
-//   },
